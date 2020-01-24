@@ -78,6 +78,15 @@ async def on_raw_reaction_add(payload):
     except Exception as e:
         print(f"Unknown error.\n{e}")
 
+    db_connection = sqlite3.connect('user_data.db')
+    db_c = db_connection.cursor()
+
+    if vote == upvote:
+        ### https://pynative.com/python-sqlite-insert-into-table/
+
+    db_connection.commit()
+    db_connection.close()
+
     print(msg.author.id)
 
 client.run(discordKey)
