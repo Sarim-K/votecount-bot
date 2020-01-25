@@ -49,7 +49,6 @@ async def on_ready():
 async def on_message(message):
     usermessage = message.content.lower()
     avatar = str(message.author.avatar_url)
-    discordname = str(message.author.name)+"#"+str(message.author.discriminator)
 
     # -----------------------------------------------------------   
     #                      View Karma Command
@@ -64,6 +63,8 @@ async def on_message(message):
             user_id_to_use = int(usermessage[1].replace("<@","").replace(">","").replace("!",""))
             member = message.guild.get_member(user_id_to_use)
             username_to_use = member.name
+            avatar = member.avatar_url
+        
         else:
             user_id_to_use = message.author.id
             username_to_use = message.author.name
@@ -76,8 +77,7 @@ async def on_message(message):
             individual_user_data = [user_id_to_use,0,0]
 
         createCard.createCard(individual_user_data[1],individual_user_data[2],username_to_use,avatar)
-
-        await message.channel.send(file="card.png")
+        await message.channel.send(file = discord.File("card.png"))
 			
 @client.event
 async def on_raw_reaction_add(payload):
