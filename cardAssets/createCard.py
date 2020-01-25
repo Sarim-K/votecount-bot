@@ -30,7 +30,7 @@ def createCard(upvotes,downvotes,name,avatar_url):
 
     img = Image.open(requests.get(avatar_url, stream=True).raw)
     size = 226, 226
-    img.thumbnail(size)
+    img = img.resize(size)
     canvas.paste(img, (15,12))
 
     img = Image.open("cardAssets/circle_overlay.png").convert("RGBA")

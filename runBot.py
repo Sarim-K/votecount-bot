@@ -172,4 +172,4 @@ async def on_raw_reaction_remove(payload):
         db_connection.commit()
         db_connection.close()
 
-client.run(discordKey) 
+client.run(discordKey)
