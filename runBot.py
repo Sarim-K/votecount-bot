@@ -62,10 +62,13 @@ async def on_message(message):
 			
 @client.event
 async def on_raw_reaction_add(payload):
+    upvote,downvote = 0,0
     if payload.emoji.id == upvote_emoji:
         vote = "upvote"
+        upvote = 1
     elif payload.emoji.id == downvote_emoji:
         vote = "downvote"
+        downvote = 1
     else:
         return
 
@@ -85,6 +88,14 @@ async def on_raw_reaction_add(payload):
     individual_user_data = db_c.fetchall()
     print(individual_user_data)
     print(type(individual_user_data))
+
+    if individual_user_data == []: #if user doesnt exist in db
+        sqlite_insert_with_param = """INSERT INTO userdata
+                          (userid, upvotes, downvotes) 
+                          VALUES (?, ?, ?);"""
+
+        data_tuple = (msg.author.id,upvote,downvote)
+        db_c.execute(sqlite_insert_with_param, data_tuple)
 
     if vote == "upvote":
         print()
