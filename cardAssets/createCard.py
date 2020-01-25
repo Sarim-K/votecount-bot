@@ -28,7 +28,10 @@ def createCard(upvotes,downvotes,name,avatar_url):
     img = Image.open("cardAssets/bar_overlay.png").convert("RGBA")
     canvas.paste(img, (0, 0), img)
 
-    img = Image.open(requests.get(avatar_url, stream=True).raw)
+    try:
+        img = Image.open(requests.get(avatar_url, stream=True).raw)
+    except:
+        img = Image.open(requests.get("https://cdn.discordapp.com/embed/avatars/1.png?size=1024", stream=True).raw)
     size = 226, 226
     img = img.resize(size)
     canvas.paste(img, (15,12))

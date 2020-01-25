@@ -98,6 +98,10 @@ async def on_raw_reaction_add(payload):
     except Exception as e:
         print(f"Unknown error.\n{e}")
 
+
+    if payload.user_id == msg.author.id:
+        return
+
     db_connection = sqlite3.connect('user_data.db')
     db_c = db_connection.cursor()
 
@@ -136,7 +140,7 @@ async def on_raw_reaction_remove(payload):
     elif payload.emoji.id == downvote_emoji:
         downvote = 1
     else:
-        return
+        return    
 
     channel = client.get_channel(payload.channel_id)
     try:
@@ -146,6 +150,9 @@ async def on_raw_reaction_remove(payload):
         return
     except Exception as e:
         print(f"Unknown error.\n{e}")
+
+    if payload.user_id == msg.author.id:
+        return
 
     db_connection = sqlite3.connect('user_data.db')
     db_c = db_connection.cursor()
