@@ -64,10 +64,8 @@ async def on_message(message):
 async def on_raw_reaction_add(payload):
     upvote,downvote = 0,0
     if payload.emoji.id == upvote_emoji:
-        vote = "upvote"
         upvote = 1
     elif payload.emoji.id == downvote_emoji:
-        vote = "downvote"
         downvote = 1
     else:
         return
@@ -87,23 +85,31 @@ async def on_raw_reaction_add(payload):
     db_c.execute("SELECT * FROM userdata WHERE userid=?", (msg.author.id,))
     individual_user_data = db_c.fetchall()
     print(individual_user_data)
-    print(type(individual_user_data))
 
     if individual_user_data == []: #if user doesnt exist in db
         sqlite_insert_with_param = """INSERT INTO userdata
                           (userid, upvotes, downvotes) 
                           VALUES (?, ?, ?);"""
-
         data_tuple = (msg.author.id,upvote,downvote)
         db_c.execute(sqlite_insert_with_param, data_tuple)
+        db_connection.commit()
+        db_connection.close()
+        return
+    else:
+        individual_user_data = str(individual_user_data[0]).replace("(","").replace(")","").replace(" ","").split(",")
+        print(individual_user_data)
+        
+        db_c.execute("DELETE from userdata where userid = ?",(msg.author.id,))
+        sqlite_insert_with_param = """INSERT INTO userdata
+                            (userid, upvotes, downvotes) 
+                            VALUES (?, ?, ?);"""
 
-    if vote == "upvote":
-        print()
-        ### https://pynative.com/python-sqlite-insert-into-table/
-
-    db_connection.commit()
-    db_connection.close()
-
-    print(msg.author.id)
+        upvotes = int(individual_user_data[1])+upvote
+        downvotes = int(individual_user_data[2])+downvote
+        data_tuple = (msg.author.id,upvotes,downvotes)
+        db_c.execute(sqlite_insert_with_param, data_tuple)
+        print(f"added {upvote} upvote and {downvote} downvote")
+        db_connection.commit()
+        db_connection.close()
 
 client.run(discordKey)
