@@ -48,7 +48,6 @@ async def on_ready():
 async def on_message(message):
     usermessage = message.content.lower()
     avatar = str(message.author.avatar_url)
-    avatar = avatar.replace("webp?size=1024","png?size=32")
     discordname = str(message.author.name)+"#"+str(message.author.discriminator)
 
     # -----------------------------------------------------------   
