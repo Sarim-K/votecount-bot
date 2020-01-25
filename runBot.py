@@ -20,6 +20,7 @@ downvote_emoji = 451890347761467402
 
 try:
     db_connection = sqlite3.connect('file:user_data.db?mode=rw', uri=True) #uri raises exception if db doesn't exist
+    #db_cursor = db_connection.cursor() ##############
 
 except sqlite3.OperationalError:
     print("Database does not exist, creating database.")
