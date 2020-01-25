@@ -1,4 +1,5 @@
 import discord, datetime, time, sqlite3, os
+from cardAssets import createCard
 from discord import NotFound
 from discord.utils import get
 
@@ -74,10 +75,9 @@ async def on_message(message):
         except:
             individual_user_data = [user_id_to_use,0,0]
 
-        title,description,colour=f"{username_to_use}'s karma:",f"{individual_user_data[1]}/{individual_user_data[2]}",0x4BB543
-        embed = discord.Embed(title=title,description=description,color=colour)
-        embed.set_author(name=discordname, icon_url=avatar)
-        await message.channel.send(embed=embed)
+        createCard.createCard(individual_user_data[1],individual_user_data[2],username_to_use,avatar)
+
+        await message.channel.send(file="card.png")
 			
 @client.event
 async def on_raw_reaction_add(payload):

@@ -57,8 +57,7 @@ def createCard(upvotes,downvotes,name,avatar_url):
     karma_coords = tuple(karma_coords)
     rimg_draw.text(karma_coords,f"{downvotes}","#FF463D",font=arial_font)
 
-
-    canvas.show()
+    canvas.save("card.png")
 
 
 createCard(106,23,"sarim","https://cdn.discordapp.com/avatars/297111993352060948/4109edce51d37d9ede756bea4e8059e9.jpg?size=1024")
