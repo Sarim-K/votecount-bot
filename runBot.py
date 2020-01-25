@@ -1,5 +1,6 @@
 import discord, datetime, time, sqlite3, os
 from discord import NotFound
+from discord.utils import get
 
 def opencfg(filename):
     file = open(filename,"r")
@@ -20,7 +21,7 @@ downvote_emoji = 451890347761467402
 
 try:
     db_connection = sqlite3.connect('file:user_data.db?mode=rw', uri=True) #uri raises exception if db doesn't exist
-    #db_cursor = db_connection.cursor() ##############
+    db_connection.close()
 
 except sqlite3.OperationalError:
     print("Database does not exist, creating database.")
@@ -51,11 +52,30 @@ async def on_message(message):
     discordname = str(message.author.name)+"#"+str(message.author.discriminator)
 
     # -----------------------------------------------------------   
-    #                        First Command
+    #                      Get Karma Command
     # -----------------------------------------------------------
 	
-    if usermessage.startswith("$firstcmd"):
-        title,description,colour=None,None,None
+    if usermessage.startswith("$karma"):
+        usermessage = usermessage.split(" ")
+        db_connection = sqlite3.connect('user_data.db')
+        db_c = db_connection.cursor()
+
+        if len(usermessage) == 2:
+            user_id_to_use = int(usermessage[1].replace("<@","").replace(">","").replace("!",""))
+            member = message.guild.get_member(user_id_to_use)
+            username_to_use = member.name
+        else:
+            user_id_to_use = message.author.id
+            username_to_use = message.author.name
+
+        try:
+            db_c.execute("SELECT * FROM userdata WHERE userid=?", (user_id_to_use,))
+            individual_user_data = db_c.fetchall()
+            individual_user_data = str(individual_user_data[0]).replace("(","").replace(")","").replace(" ","").split(",")
+        except:
+            individual_user_data = ["NO DATA","NO DATA","NO DATA"]
+
+        title,description,colour=f"{username_to_use}'s karma:",f"{individual_user_data[1]}/{individual_user_data[2]}",0x4BB543
         embed = discord.Embed(title=title,description=description,color=colour)
         embed.set_author(name=discordname, icon_url=avatar)
         await message.channel.send(embed=embed)
@@ -84,7 +104,6 @@ async def on_raw_reaction_add(payload):
 
     db_c.execute("SELECT * FROM userdata WHERE userid=?", (msg.author.id,))
     individual_user_data = db_c.fetchall()
-    print(individual_user_data)
 
     if individual_user_data == []: #if user doesnt exist in db
         sqlite_insert_with_param = """INSERT INTO userdata
@@ -97,7 +116,6 @@ async def on_raw_reaction_add(payload):
         return
     else:
         individual_user_data = str(individual_user_data[0]).replace("(","").replace(")","").replace(" ","").split(",")
-        print(individual_user_data)
         
         db_c.execute("DELETE from userdata where userid = ?",(msg.author.id,))
         sqlite_insert_with_param = """INSERT INTO userdata
@@ -108,7 +126,6 @@ async def on_raw_reaction_add(payload):
         downvotes = int(individual_user_data[2])+downvote
         data_tuple = (msg.author.id,upvotes,downvotes)
         db_c.execute(sqlite_insert_with_param, data_tuple)
-        print(f"added {upvote} upvote and {downvote} downvote")
         db_connection.commit()
         db_connection.close()
 
