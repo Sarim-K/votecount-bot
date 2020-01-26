@@ -2,7 +2,7 @@
 discord bot to count upvotes &amp; downvote reactions
 
 a discord bot that replicates a system similar to reddit's karma system, only with discord reactions (upvotes and downvotes).  
-utilises Pillow in order to create user card, to display karma count.
+upvote & downvote emoji ID's are defined at the start of runBot.py, as integers.
 
 
 dependencies:  
