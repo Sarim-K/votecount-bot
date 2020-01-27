@@ -19,6 +19,7 @@ keyList = opencfg("apikeys.txt")
 API_KEY, discordKey, testDiscordKey, GENIUS_API_KEY = str(keyList[0]), str(keyList[1]), str(keyList[2]), str(keyList[3])
 upvote_emoji = 452121917462151169
 downvote_emoji = 451890347761467402
+rt_emoji = 451882250884218881
 
 try:
     db_connection = sqlite3.connect('file:user_data.db?mode=rw', uri=True) #uri raises exception if db doesn't exist
@@ -82,7 +83,7 @@ async def on_message(message):
 @client.event
 async def on_raw_reaction_add(payload):
     upvote,downvote = 0,0
-    if payload.emoji.id == upvote_emoji:
+    if payload.emoji.id == upvote_emoji or payload.emoji.id == rt_emoji:
         upvote = 1
     elif payload.emoji.id == downvote_emoji:
         downvote = 1
