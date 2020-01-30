@@ -10,6 +10,10 @@ def opencfg(filename):
     
     keyList = []
     for entry in keys:
+        entry = entry.strip()
+        if entry == "":
+            continue
+
         tempEntry = entry.split("=")
         tempEntry = tempEntry[1]
         tempEntry = tempEntry.replace(" ","")
@@ -20,7 +24,8 @@ def opencfg(filename):
 keyList = opencfg("apikeys.txt")
 API_KEY, discordKey, testDiscordKey, GENIUS_API_KEY = str(keyList[0]), str(keyList[1]), str(keyList[2]), str(keyList[3])
 adminList = opencfg("adminlist.txt")
-upvote_emoji, downvote_emoji, rt_emoji = 452121917462151169, 451890347761467402, 451882250884218881
+#upvote_emoji, downvote_emoji, rt_emoji = 452121917462151169, 451890347761467402, 451882250884218881 #omega
+upvote_emoji, downvote_emoji, rt_emoji = 672496031107383296, 672496040275869698, 649803488041369641 #testing server
 
 class createHelpMessage:
     def __init__(self, title, description, colour):
@@ -92,36 +97,112 @@ async def on_message(message):
         if admin == False:
             return
 
-        if usermessage == "$blacklist add":
-            usermessage = usermessage.split(" ")
-            userid = usermessage[2].replace("<","").replace("@","").replace("!","").replace(">","")
+        if usermessage.startswith("$blacklist add"): #done    
+            try:
+                usermessage = usermessage.split(" ")
+                userid = usermessage[2].replace("<","").replace("@","").replace("!","").replace(">","")
 
-            f = open("blacklist.txt","a")
-            f.write(f"userid={userid}\n")
-            f.close()
-
-            del userid
+                f = open("blacklist.txt","a")
+                f.write(f"userid={userid}\n")
+                f.close()
+                
+                user = await client.fetch_user(userid)
+                embed = discord.Embed(title=f"{user.name}#{user.discriminator} added to blacklist",color=0x4BB543)
+                embed.set_author(name=message.author, icon_url=avatar)
+                await message.channel.send(embed=embed) 
+                del userid
+            except Exception as e:
+                embed = discord.Embed(title='<:O_O:617420634854653963>  error occured',description=e,colour=0xff0000)
+                embed.set_author(name=message.author, icon_url=avatar)
+                try:
+                    await message.channel.send(embed=embed)
+                except:
+                    print(e)
+                    embed = discord.Embed(title='<:O_O:617420634854653963>  error occured',description="error printed to console",colour=0xff0000)
+                    embed.set_author(name=message.author, icon_url=avatar)
+                    await message.channel.send(embed=embed)                
         
-        if usermessage == "$blacklist remove":
-            usermessage = usermessage.split(" ")
-            userid = usermessage[2].replace("<","").replace("@","").replace("!","").replace(">","")
-            tempList = []
-           
-            f = open("blacklist.txt","r+")
-            tempBlacklist = f.readlines()
-            f.truncate(0) #deletes all contents
-            f.close()
+        elif usermessage.startswith("$blacklist remove"): #done
+            try:
+                usermessage = usermessage.split(" ")
+                userid = usermessage[2].replace("<","").replace("@","").replace("!","").replace(">","")
+                tempList = []
+            
+                f = open("blacklist.txt","r+")
+                tempBlacklist = f.readlines()
+                f.truncate(0) #deletes all contents
+                f.close()
 
-            for line in tempBlacklist:
-                line = line.split("=")
-                if line[1] != userid:
-                    tempList.append(f"user={line[1]}")
+                for line in tempBlacklist:
+                    line = line.strip()
+                    line = line.split("=")
+                    print(line)
+                    try:
+                        if line[1] != userid:
+                            tempList.append(f"user={line[1]}")
+                    except IndexError:
+                        continue
 
-            f = open("blacklist.txt","a")
-            for line in tempBlacklist:
-                f.write(f"{line}\n")
-            f.close()
+                f = open("blacklist.txt","w")
+                for line in tempList:
+                    f.write(f"{line}\n")
+                f.close()
 
+                user = await client.fetch_user(userid)
+                embed = discord.Embed(title=f"{user.name}#{user.discriminator} removed from blacklist",color=0x4BB543)
+                embed.set_author(name=message.author, icon_url=avatar)
+                await message.channel.send(embed=embed)
+
+                del tempBlacklist
+                del tempList
+                del user
+
+            except Exception as e:
+                embed = discord.Embed(title='<:O_O:617420634854653963>  error occured',description=e,colour=0xff0000)
+                embed.set_author(name=message.author, icon_url=avatar)
+                try:
+                    await message.channel.send(embed=embed)
+                except:
+                    print(e)
+                    embed = discord.Embed(title='<:O_O:617420634854653963>  error occured',description="error printed to console",colour=0xff0000)
+                    embed.set_author(name=message.author, icon_url=avatar)
+                    await message.channel.send(embed=embed)        
+
+        elif usermessage.startswith("$blacklist view"):
+            try:
+                parsedUsers = ""
+                f = open("blacklist.txt","r")
+                tempBlacklist = f.readlines()
+                f.close()
+
+                for line in tempBlacklist:
+                    line = line.strip()
+                    line = line.split("=")
+                    try:
+                        user = await client.fetch_user(line[1])
+                        parsedUsers += (f"{user.name}#{user.discriminator}")
+                    except IndexError:
+                        if len(parsedUsers) == 0:
+                            parsedUsers = "the blacklist is empty"
+                        break
+
+                embed = discord.Embed(title="blacklisted users:",description=parsedUsers,color=0x4BB543)
+                embed.set_author(name=message.author, icon_url=avatar)
+                await message.channel.send(embed=embed)
+
+                del tempBlacklist
+                del parsedUsers
+
+            except Exception as e:
+                embed = discord.Embed(title='<:O_O:617420634854653963>  error occured',description=e,colour=0xff0000)
+                embed.set_author(name=message.author, icon_url=avatar)
+                try:
+                    await message.channel.send(embed=embed)
+                except:
+                    print(e)
+                    embed = discord.Embed(title='<:O_O:617420634854653963>  error occured',description="error printed to console",colour=0xff0000)
+                    embed.set_author(name=f"{message.author}", icon_url=avatar)
+                    await message.channel.send(embed=embed)    
 
     elif usermessage.startswith("$help"):
 
@@ -151,7 +232,7 @@ async def on_message(message):
 
         else: #catch-all help command
             if admin == True:
-                help_message = createHelpMessage("help commands:","$karma\n\n$set_karma\n$blacklist",1)
+                help_message = createHelpMessage("help commands:","$karma\n-------\n$set_karma\n$blacklist",1)
             else:
                 help_message = createHelpMessage("help commands:","$karma",1)
             embed = discord.Embed(title=help_message.title,description=help_message.description,color=help_message.colour)
@@ -161,62 +242,64 @@ async def on_message(message):
 
 @client.event
 async def on_raw_reaction_add(payload):
-    
-    blacklist = opencfg("blacklist.txt")
-    if str(payload.user_id) in blacklist:
-        return
 
-    upvote,downvote = 0,0
-    if payload.emoji.id == upvote_emoji or payload.emoji.id == rt_emoji:
-        upvote = 1
-    elif payload.emoji.id == downvote_emoji:
-        downvote = 1
-    else:
-        return
+    try:  
+        blacklist = opencfg("blacklist.txt")
+        if str(payload.user_id) in blacklist:
+            return
 
-    channel = client.get_channel(payload.channel_id)
-    try:
-        msg = await channel.fetch_message(payload.message_id)
-    except NotFound:
-        print("Message not found.")
-        return
-    except Exception as e:
-        print(f"Unknown error.\n{e}")
+        upvote,downvote = 0,0
+        if payload.emoji.id == upvote_emoji or payload.emoji.id == rt_emoji:
+            upvote = 1
+        elif payload.emoji.id == downvote_emoji:
+            downvote = 1
+        else:
+            return
 
+        channel = client.get_channel(payload.channel_id)
+        try:
+            msg = await channel.fetch_message(payload.message_id)
+        except NotFound:
+            print("Message not found.")
+            return
+        except Exception as e:
+            print(f"Unknown error.\n{e}")
 
-    if payload.user_id == msg.author.id:
-        return
+        if payload.user_id == msg.author.id:
+            return
 
-    db_connection = sqlite3.connect('user_data.db')
-    db_c = db_connection.cursor()
+        db_connection = sqlite3.connect('user_data.db')
+        db_c = db_connection.cursor()
 
-    db_c.execute("SELECT * FROM userdata WHERE userid=?", (msg.author.id,))
-    individual_user_data = db_c.fetchall()
+        db_c.execute("SELECT * FROM userdata WHERE userid=?", (msg.author.id,))
+        individual_user_data = db_c.fetchall()
 
-    if individual_user_data == []: #if user doesnt exist in db
-        sqlite_insert_with_param = """INSERT INTO userdata
-                          (userid, upvotes, downvotes) 
-                          VALUES (?, ?, ?);"""
-        data_tuple = (msg.author.id,upvote,downvote)
-        db_c.execute(sqlite_insert_with_param, data_tuple)
-        db_connection.commit()
-        db_connection.close()
-        return
-    else:
-        individual_user_data = str(individual_user_data[0]).replace("(","").replace(")","").replace(" ","").split(",")
-        
-        db_c.execute("DELETE from userdata where userid = ?",(msg.author.id,))
-        sqlite_insert_with_param = """INSERT INTO userdata
+        if individual_user_data == []: #if user doesnt exist in db
+            sqlite_insert_with_param = """INSERT INTO userdata
                             (userid, upvotes, downvotes) 
                             VALUES (?, ?, ?);"""
+            data_tuple = (msg.author.id,upvote,downvote)
+            db_c.execute(sqlite_insert_with_param, data_tuple)
+            db_connection.commit()
+            db_connection.close()
+            return
+        else:
+            individual_user_data = str(individual_user_data[0]).replace("(","").replace(")","").replace(" ","").split(",")
+            
+            db_c.execute("DELETE from userdata where userid = ?",(msg.author.id,))
+            sqlite_insert_with_param = """INSERT INTO userdata
+                                (userid, upvotes, downvotes) 
+                                VALUES (?, ?, ?);"""
 
-        upvotes = int(individual_user_data[1])+upvote
-        downvotes = int(individual_user_data[2])+downvote
-        data_tuple = (msg.author.id,upvotes,downvotes)
-        db_c.execute(sqlite_insert_with_param, data_tuple)
-        db_connection.commit()
-        db_connection.close()
-
+            upvotes = int(individual_user_data[1])+upvote
+            downvotes = int(individual_user_data[2])+downvote
+            data_tuple = (msg.author.id,upvotes,downvotes)
+            db_c.execute(sqlite_insert_with_param, data_tuple)
+            db_connection.commit()
+            db_connection.close()
+    except Exception as e:
+        print(e)
+        
 @client.event
 async def on_raw_reaction_remove(payload):
     
@@ -269,4 +352,4 @@ async def on_raw_reaction_remove(payload):
         db_connection.commit()
         db_connection.close()
 
-client.run(discordKey)
+client.run(testDiscordKey)
