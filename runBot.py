@@ -237,9 +237,9 @@ async def on_message(message):
 
         else: #catch-all help command
             if admin == True:
-                help_message = createHelpMessage("help commands:","$karma\n-------\n$set_karma\n$blacklist",1)
+                help_message = createHelpMessage("karma commands:","$karma\n-------\n$set_karma\n$blacklist",1)
             else:
-                help_message = createHelpMessage("help commands:","$karma",1)
+                help_message = createHelpMessage("karma commands:","$karma",1)
             embed = discord.Embed(title=help_message.title,description=help_message.description,color=help_message.colour)
             embed.set_author(name=message.author, icon_url=avatar)
             await message.channel.send(embed=embed)
