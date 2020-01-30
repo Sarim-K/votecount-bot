@@ -66,7 +66,7 @@ async def on_message(message):
     avatar = str(message.author.avatar_url)
     admin = False
     if str(message.author.id) in adminList:
-        admin = True #await message.author.send()
+        admin = True
 	
     if usermessage.startswith("$karma"):
         usermessage = usermessage.split(" ")
@@ -188,7 +188,11 @@ async def on_message(message):
 
                 embed = discord.Embed(title="blacklisted users:",description=parsedUsers,color=0x4BB543)
                 embed.set_author(name=message.author, icon_url=avatar)
-                await message.channel.send(embed=embed)
+                try:
+                    await message.author.send(embed=embed)
+                except:
+                    embed = discord.Embed(title="enable DM's to view blacklist",color=0xff0000)
+                    await message.channel.send(embed=embed)
 
                 del tempBlacklist
                 del parsedUsers
@@ -202,6 +206,7 @@ async def on_message(message):
                     print(e)
                     embed = discord.Embed(title='<:O_O:617420634854653963>  error occured',description="error printed to console",colour=0xff0000)
                     embed.set_author(name=f"{message.author}", icon_url=avatar)
+
                     await message.channel.send(embed=embed)    
 
     elif usermessage.startswith("$help"):
@@ -352,4 +357,4 @@ async def on_raw_reaction_remove(payload):
         db_connection.commit()
         db_connection.close()
 
-client.run(testDiscordKey)
+client.run(discordKey)
