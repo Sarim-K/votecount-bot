@@ -136,7 +136,6 @@ async def on_message(message):
                 for line in tempBlacklist:
                     line = line.strip()
                     line = line.split("=")
-                    print(line)
                     try:
                         if line[1] != userid:
                             tempList.append(f"user={line[1]}")
@@ -237,7 +236,7 @@ async def on_message(message):
 
         elif usermessage == "$help": #catch-all help command
             if admin == True:
-                help_message = createHelpMessage("karma commands:","$karma\n-------\n$set_karma\n$blacklist",1)
+                help_message = createHelpMessage("karma commands:","$karma\n$set_karma\n$blacklist",1)
             else:
                 help_message = createHelpMessage("karma commands:","$karma",1)
             embed = discord.Embed(title=help_message.title,description=help_message.description,color=help_message.colour)
