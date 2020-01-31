@@ -1,4 +1,5 @@
 import discord, datetime, time, sqlite3, os
+import helpcommands
 from cardAssets import createCard
 from discord import NotFound
 from discord.utils import get
@@ -24,8 +25,8 @@ def opencfg(filename):
 keyList = opencfg("apikeys.txt")
 API_KEY, discordKey, testDiscordKey, GENIUS_API_KEY = str(keyList[0]), str(keyList[1]), str(keyList[2]), str(keyList[3])
 adminList = opencfg("adminlist.txt")
-#upvote_emoji, downvote_emoji, rt_emoji = 452121917462151169, 451890347761467402, 451882250884218881 #omega
-upvote_emoji, downvote_emoji, rt_emoji = 672496031107383296, 672496040275869698, 649803488041369641 #testing server
+upvote_emoji, downvote_emoji, rt_emoji = 452121917462151169, 451890347761467402, 451882250884218881 #omega
+#upvote_emoji, downvote_emoji, rt_emoji = 672496031107383296, 672496040275869698, 649803488041369641 #testing server
 
 class createHelpMessage:
     def __init__(self, title, description, colour):
@@ -209,43 +210,8 @@ async def on_message(message):
                     await message.channel.send(embed=embed)    
 
     elif usermessage.startswith("$help"):
-
-        if usermessage == "$help blacklist": #admin only
-            if admin == True:
-                help_message = createHelpMessage("blacklist a user from being recognised from the bot:","commands:\n$blacklist add\n$blacklist remove\n$blacklist view",1)
-                embed = discord.Embed(title=help_message.title,description=help_message.description,color=help_message.colour)
-                embed.set_author(name=message.author, icon_url=avatar)
-                await message.channel.send(embed=embed)
-            else:
-                return
-
-        elif usermessage == "$help set_karma": #admin only
-            if admin == True:
-                help_message = createHelpMessage("set a user's upvotes|downvotes:","usage: $set_karma @sarim 20|25",1)
-                embed = discord.Embed(title=help_message.title,description=help_message.description,color=help_message.colour)
-                embed.set_author(name=message.author, icon_url=avatar)
-                await message.channel.send(embed=embed)
-            else:
-                return
-
-        elif usermessage == "$help karma":
-            help_message = createHelpMessage("displays a user's karma count","",1)
-            embed = discord.Embed(title=help_message.title,description=help_message.description,color=help_message.colour)
-            embed.set_author(name=message.author, icon_url=avatar)
-            await message.channel.send(embed=embed)
-
-        elif usermessage == "$help": #catch-all help command
-            if admin == True:
-                help_message = createHelpMessage("karma commands:","$karma\n$set_karma\n$blacklist",1)
-            else:
-                help_message = createHelpMessage("karma commands:","$karma",1)
-            embed = discord.Embed(title=help_message.title,description=help_message.description,color=help_message.colour)
-            embed.set_author(name=message.author, icon_url=avatar)
-            await message.channel.send(embed=embed)
-
-        else:
-            return
-        
+        embed = helpcommands.helpcommands(usermessage,message,avatar,admin)
+        await message.channel.send(embed=embed)
 
 @client.event
 async def on_raw_reaction_add(payload):
