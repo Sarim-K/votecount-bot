@@ -8,7 +8,9 @@ upvote & downvote emoji ID's are defined at the start of runBot.py, as integers.
 dependencies:  
 discord.py #pip install discord  
 Pillow #pip install Pillow  
-apikeys.txt #in master directory
+apikeys.txt #in master directory  
+adminlist.txt #in master directory (blank file)  
+blacklist.txt #in master directory (blank file)  
 
 
 apikeys.txt is formatted as such:  
