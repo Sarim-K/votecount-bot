@@ -1,8 +1,8 @@
 # votecount-bot
 discord bot to count upvotes &amp; downvote reactions
 
-a discord bot that replicates a system similar to reddit's karma system, only with discord reactions (upvotes and downvotes).  
-upvote & downvote emoji ID's are defined at the start of runBot.py, as integers.
+a discord bot that replicates a system similar to reddit's karma system, only with discord reactions (upvotes, downvotes, retweets).  
+upvote, downvote & rt emoji ID's are defined at the start of runBot.py, as integers.
 
 
 dependencies:  
