@@ -22,6 +22,7 @@ def opencfg(filename):
         tempEntry = str(tempEntry)
         keyList.append(tempEntry)
     return keyList
+
 keyList = opencfg("apikeys.txt")
 API_KEY, discordKey, testDiscordKey, GENIUS_API_KEY = str(keyList[0]), str(keyList[1]), str(keyList[2]), str(keyList[3])
 adminList = opencfg("adminlist.txt")
@@ -37,7 +38,6 @@ class createHelpMessage:
 try:
     db_connection = sqlite3.connect('file:user_data.db?mode=rw', uri=True) #uri raises exception if db doesn't exist
     db_connection.close()
-
 except sqlite3.OperationalError:
     print("Database does not exist, creating database.")
     db_connection = sqlite3.connect('user_data.db')
@@ -50,9 +50,11 @@ except sqlite3.OperationalError:
                 )""")
     db_connection.commit()
     db_connection.close()
-
 except Exception as e:
     print(f"Unknown error.\n{e}")
+
+f = open("adminlist.txt", 'w+');f.close()
+f = open("blacklist.txt", 'w+');f.close()
 
 ##################################################################################
 
@@ -98,7 +100,7 @@ async def on_message(message):
         if admin == False:
             return
 
-        if usermessage.startswith("$blacklist add"): #done    
+        if usermessage.startswith("$blacklist add"):  
             try:
                 usermessage = usermessage.split(" ")
                 userid = usermessage[2].replace("<","").replace("@","").replace("!","").replace(">","")
@@ -123,7 +125,7 @@ async def on_message(message):
                     embed.set_author(name=message.author, icon_url=avatar)
                     await message.channel.send(embed=embed)                
         
-        elif usermessage.startswith("$blacklist remove"): #done
+        elif usermessage.startswith("$blacklist remove"): 
             try:
                 usermessage = usermessage.split(" ")
                 userid = usermessage[2].replace("<","").replace("@","").replace("!","").replace(">","")
@@ -209,13 +211,28 @@ async def on_message(message):
 
                     await message.channel.send(embed=embed)    
 
+    elif usermessage.startswith("$set_karma"):
+        print("lol") #admin only
+        #if admin == False:
+        #    return
+
+        usermessage = usermessage.split(" ")
+        karma = usermessage[2].split("|")
+        db_connection = sqlite3.connect('user_data.db')
+        db_c = db_connection.cursor()
+
+        db_c.execute("UPDATE userdata SET upvotes = ? WHERE userid=?", (karma[0], message.author.id,))
+        db_c.execute("UPDATE userdata SET downvotes = ? WHERE userid=?", (karma[1], message.author.id,))
+        
+        db_connection.commit()
+        db_connection.close()
+
     elif usermessage.startswith("$help"):
         embed = helpcommands.helpcommands(usermessage,message,avatar,admin)
         await message.channel.send(embed=embed)
 
 @client.event
 async def on_raw_reaction_add(payload):
-
     try:  
         blacklist = opencfg("blacklist.txt")
         if str(payload.user_id) in blacklist:
@@ -275,7 +292,6 @@ async def on_raw_reaction_add(payload):
         
 @client.event
 async def on_raw_reaction_remove(payload):
-    
     blacklist = opencfg("blacklist.txt")
     if str(payload.user_id) in blacklist:
         return
@@ -325,4 +341,4 @@ async def on_raw_reaction_remove(payload):
         db_connection.commit()
         db_connection.close()
 
-client.run(discordKey)
+client.run(testDiscordKey)
