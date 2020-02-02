@@ -3,4 +3,5 @@ apikeys.txt
 adminlist.txt
 blacklist.txt
 cardAssets/__pycache__
+__pycache__
 card.png
