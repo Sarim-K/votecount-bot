@@ -53,8 +53,15 @@ except sqlite3.OperationalError:
 except Exception as e:
     print(f"Unknown error.\n{e}")
 
-f = open("adminlist.txt", 'w+');f.close()
-f = open("blacklist.txt", 'w+');f.close()
+try:
+  f = open("adminlist.txt");f.close()
+except IOError:
+  f = open("adminlist.txt", 'w+');f.close()
+  
+try:
+  f = open("blacklist.txt");f.close()
+except IOError:
+  f = open("blacklist.txt", 'w+');f.close()
 
 ##################################################################################
 
@@ -212,17 +219,18 @@ async def on_message(message):
                     await message.channel.send(embed=embed)    
 
     elif usermessage.startswith("$set_karma"):
-        print("lol") #admin only
-        #if admin == False:
-        #    return
+        if admin == False:
+            return
 
         usermessage = usermessage.split(" ")
         karma = usermessage[2].split("|")
+        userid = usermessage[1].replace("<@","").replace(">","").replace("!","")
+        
         db_connection = sqlite3.connect('user_data.db')
         db_c = db_connection.cursor()
 
-        db_c.execute("UPDATE userdata SET upvotes = ? WHERE userid=?", (karma[0], message.author.id,))
-        db_c.execute("UPDATE userdata SET downvotes = ? WHERE userid=?", (karma[1], message.author.id,))
+        db_c.execute("UPDATE userdata SET upvotes = ? WHERE userid=?", (karma[0], userid,))
+        db_c.execute("UPDATE userdata SET downvotes = ? WHERE userid=?", (karma[1], userid,))
         
         db_connection.commit()
         db_connection.close()
@@ -341,4 +349,4 @@ async def on_raw_reaction_remove(payload):
         db_connection.commit()
         db_connection.close()
 
-client.run(testDiscordKey)
+client.run(discordKey)
